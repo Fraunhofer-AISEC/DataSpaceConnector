@@ -17,7 +17,9 @@ package org.eclipse.edc.iam.oauth2;
 
 import dev.failsafe.RetryPolicy;
 import okhttp3.OkHttpClient;
+
 import okhttp3.Response;
+import org.eclipse.dataspaceconnector.iam.oauth2.core.identity.DATRequestApiController;
 import org.eclipse.edc.iam.oauth2.identity.IdentityProviderKeyResolver;
 import org.eclipse.edc.iam.oauth2.identity.IdentityProviderKeyResolverConfiguration;
 import org.eclipse.edc.iam.oauth2.identity.Oauth2ServiceImpl;
@@ -39,6 +41,7 @@ import org.eclipse.edc.spi.security.CertificateResolver;
 import org.eclipse.edc.spi.security.PrivateKeyResolver;
 import org.eclipse.edc.spi.system.ServiceExtension;
 import org.eclipse.edc.spi.system.ServiceExtensionContext;
+import org.eclipse.edc.web.spi.WebService;
 
 import java.security.PrivateKey;
 import java.security.cert.CertificateEncodingException;
@@ -75,6 +78,9 @@ public class Oauth2Extension implements ServiceExtension {
     @Setting
     private static final String NOT_BEFORE_LEEWAY = "edc.oauth.validation.nbf.leeway";
     private IdentityProviderKeyResolver providerKeyResolver;
+
+    @Inject
+    private WebService webService;
 
     @Inject
     private OkHttpClient okHttpClient;
@@ -132,6 +138,7 @@ public class Oauth2Extension implements ServiceExtension {
         );
 
         context.registerService(IdentityService.class, oauth2Service);
+        webService.registerResource(new DATRequestApiController(context.getMonitor(), oauth2Service));
     }
 
     @Override

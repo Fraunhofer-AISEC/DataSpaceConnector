@@ -24,7 +24,8 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.failsafe.okhttp)
 
-    testImplementation(project(":core:common:junit"))
+    implementation(project(":extensions:common:http"))
+    implementation(libs.jakarta.rsApi)
 
     testImplementation(libs.mockserver.netty)
     testImplementation(libs.mockserver.client)
