@@ -21,4 +21,8 @@ This extension provides an `IdentityService` implementation based on the OAuth2 
 ### CredentialsRequestAdditionalParametersProvider
 
 An instance of the `CredentialsRequestAdditionalParametersProvider` service interface can be provided to have the
-possibility to enrich the form parameters of the client credentials token request 
+possibility to enrich the form parameters of the client credentials token request
+
+### DAT Request
+An endpoint to perform a DAT request is available at ```http://localhost:8181/api/dat-request``` using the default
+configuration, it displays the response from the DAPS (DAT) or an error message.
