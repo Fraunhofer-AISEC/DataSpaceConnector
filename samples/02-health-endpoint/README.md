@@ -10,35 +10,27 @@ An _extension_ typically consists of two things:
    interface's fully qualified class-name and it **must** contain the fully-qualified name of the implementing class (
    =plugin class).
 
-Therefore we require an extension class, which we'll name `HealthEndpointExtension`:
+Therefore, we require an extension class, which we'll name `HealthEndpointExtension`:
 
 ```java
 public class HealthEndpointExtension implements ServiceExtension {
-    @Override
-    public Set<String> requires() {
-        return Set.of("edc:webservice");
-    }
+
+    @Inject
+    WebService webService;
 
     @Override
     public void initialize(ServiceExtensionContext context) {
-        var webService = context.getService(WebService.class);
-        webService.registerController(new HealthApiController(context.getMonitor()));
+        webService.registerResource(new HealthApiController(context.getMonitor()));
     }
 }
 ```
 
-The `requires()` method indicates that there is a dependency onto the `"edc:webservice"` feature, which is offered by
-the `WebServiceExtension.java` located in the `:core:protocol:web` module (remember how we added that to our build
-file?).
-
-The `ServiceExtensionContext` serves as registry for all resolvable services, somewhat comparable to the "module"
-concept in DI frameworks like Google Guice. From it we obtain an instance of the `WebService` interface, where we can
-register our API controller class.
+The `@Inject` annotation indicates that the extension needs a service that is registered by another extension, in 
+this case an implementation of `WebService.class`.
 
 For that, we can use Jakarta REST annotations to implement a simple REST API:
 
 ```java
-
 @Consumes({MediaType.APPLICATION_JSON})
 @Produces({MediaType.APPLICATION_JSON})
 @Path("/")
@@ -54,7 +46,7 @@ public class HealthApiController {
     @Path("health")
     public String checkHealth() {
         monitor.info("Received a health request");
-        return "I'm alive!";
+        return "{\"response\":\"I'm alive!\"}";
     }
 }
 ```
@@ -68,8 +60,15 @@ java -jar samples/02-health-endpoint/build/libs/connector-health.jar
 
 we can issue a GET request to `http://localhost:8181/api/health` and receive the aforementioned string as a result.
 
-It is worth noting that by default the webserver listens on port `8181`, which is defined in `JettyService.java` and can
-be configured using the `web.http.port` property (more on that in the next chapter). You will need to configure this
-whenever you have two connectors running on the same machine.
+It is worth noting that by default the webserver listens on port `8181`, which is defined
+in [`JettyConfiguration.java`](../../extensions/common/http/jetty-core/src/main/java/org/eclipse/edc/web/jetty/JettyConfiguration.java)
+and can be configured using the `web.http.port` property (more on that in the next chapter). You will need to configure
+this whenever you have two connectors running on the same machine.
 
-Also, the default path is `"/api/*"`, which is defined in `JerseyRestService.java`.
+Also, the default path is `/api/*`, which is defined
+in [`JettyConfiguration.java`](../../extensions/common/http/jetty-core/src/main/java/org/eclipse/edc/web/jetty/JettyConfiguration.java)
+.
+
+---
+
+[Previous Chapter](../01-basic-connector/README.md) | [Next Chapter](../03-configuration/README.md)

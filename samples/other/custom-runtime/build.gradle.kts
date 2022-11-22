@@ -15,31 +15,23 @@
 plugins {
     `java-library`
     id("application")
-    id("com.github.johnrengelman.shadow") version "7.0.0"
+    id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
-val jupiterVersion: String by project
-
 dependencies {
-    api(project(":core:bootstrap"))
-    implementation(project(":core:protocol:web"))
-    implementation(project(":core:transfer"))
+    api(project(":core:common:boot"))
     implementation(project(":data-protocols:ids"))
-    implementation(project(":extensions:in-memory:policy-registry-memory"))
-    implementation(project(":extensions:in-memory:metadata-memory"))
-    implementation(project(":extensions:in-memory:transfer-store-memory"))
-    implementation(project(":extensions:iam:iam-mock"))
-    implementation(project(":data-protocols:ids:ids-policy-mock"))
-    implementation(project(":extensions:filesystem:configuration-fs"))
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:${jupiterVersion}")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${jupiterVersion}")
+    implementation(project(":extensions:common:iam:iam-mock"))
+    implementation(project(":extensions:common:configuration:configuration-filesystem"))
+
+    testImplementation(libs.junit.jupiter.api)
+    testRuntimeOnly(libs.junit.jupiter.engine)
 
 }
 
 application {
-    @Suppress("DEPRECATION")
-    mainClassName = "org.eclipse.dataspaceconnector.demo.runtime.CustomRuntime"
+    mainClass.set("org.eclipse.edc.sample.runtime.CustomRuntime")
 }
 
 tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {

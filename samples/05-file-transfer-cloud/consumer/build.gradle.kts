@@ -9,45 +9,39 @@
  *
  *  Contributors:
  *       Microsoft Corporation - initial API and implementation
+ *       Fraunhofer Institute for Software and Systems Engineering - added dependencies
+ *       ZF Friedrichshafen AG - add dependency
  *
  */
 
 plugins {
     `java-library`
     id("application")
-    id("com.github.johnrengelman.shadow") version "7.0.0"
+    id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
-val jupiterVersion: String by project
-val rsApi: String by project
-
 dependencies {
-    implementation(project(":core:bootstrap"))
-    implementation(project(":core:transfer"))
-    implementation(project(":core:protocol:web"))
-    implementation(project(":core:policy:policy-model"))
-    implementation(project(":core:policy:policy-engine"))
+    implementation(project(":core:control-plane:control-plane-core"))
 
-    implementation(project(":extensions:in-memory:transfer-store-memory"))
-    implementation(project(":extensions:in-memory:policy-registry-memory"))
-    implementation(project(":extensions:filesystem:configuration-fs"))
-    implementation(project(":extensions:iam:iam-mock"))
-    implementation(project(":extensions:in-memory:metadata-memory"))
-    implementation(project(":extensions:azure:vault"))
-    implementation(project(":extensions:aws:s3:provision"))
+    implementation(project(":extensions:common:api:api-observability"))
+
+    implementation(project(":extensions:common:configuration:configuration-filesystem"))
+
+    implementation(project(":extensions:common:http"))
+
+    implementation(project(":extensions:control-plane:provision:provision-aws-s3"))
+
+    implementation(project(":extensions:common:iam:iam-mock"))
+    implementation(project(":extensions:common:vault:vault-azure"))
+
+    implementation(project(":extensions:common:auth:auth-tokenbased"))
+    implementation(project(":extensions:control-plane:api:management-api"))
 
     implementation(project(":data-protocols:ids"))
-    implementation(project(":data-protocols:ids:ids-policy-mock"))
-
-    implementation(project(":samples:05-file-transfer-cloud:api"))
-
-    testImplementation("org.junit.jupiter:junit-jupiter-api:${jupiterVersion}")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${jupiterVersion}")
 }
 
 application {
-    @Suppress("DEPRECATION")
-    mainClassName = "org.eclipse.dataspaceconnector.system.runtime.BaseRuntime"
+    mainClass.set("org.eclipse.edc.boot.system.runtime.BaseRuntime")
 }
 
 tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {

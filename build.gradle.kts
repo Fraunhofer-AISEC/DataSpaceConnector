@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2020, 2021 Microsoft Corporation
+ *  Copyright (c) 2022 Microsoft Corporation
  *
  *  This program and the accompanying materials are made available under the
  *  terms of the Apache License, Version 2.0 which is available at
@@ -12,107 +12,100 @@
  *
  */
 
+
 plugins {
     `java-library`
-    `maven-publish`
-    checkstyle
+    // todo: remove once https://github.com/eclipse-dataspaceconnector/DataSpaceConnector/issues/2191 is complete
+    id("org.hidetake.swagger.generator") version "2.19.2"
 }
 
+val javaVersion: String by project
+val edcScmConnection: String by project
+val edcWebsiteUrl: String by project
+val edcScmUrl: String by project
+val groupId: String by project
+val defaultVersion: String by project
+val annotationProcessorVersion: String by project
+val metaModelVersion: String by project
+
+val actualVersion: String = (project.findProperty("edcVersion") ?: defaultVersion) as String
+
+buildscript {
+    dependencies {
+        val edcGradlePluginsVersion: String by project
+        classpath("org.eclipse.edc.edc-build:org.eclipse.edc.edc-build.gradle.plugin:${edcGradlePluginsVersion}")
+    }
+}
+
+dependencies {
+    "swaggerUI"("org.webjars:swagger-ui:4.15.5")
+}
+
+allprojects {
+    apply(plugin = "${groupId}.edc-build")
+
+    // configure which version of the annotation processor to use. defaults to the same version as the plugin
+    configure<org.eclipse.edc.plugins.autodoc.AutodocExtension> {
+        processorVersion.set(annotationProcessorVersion)
+        outputDirectory.set(project.buildDir)
+    }
+
+    configure<org.eclipse.edc.plugins.edcbuild.extensions.BuildExtension> {
+        versions {
+            // override default dependency versions here
+            projectVersion.set(actualVersion)
+            metaModel.set(metaModelVersion)
+
+        }
+        pom {
+            projectName.set(project.name)
+            description.set("edc :: ${project.name}")
+            projectUrl.set(edcWebsiteUrl)
+            scmConnection.set(edcScmConnection)
+            scmUrl.set(edcScmUrl)
+        }
+        swagger {
+            title.set("EDC REST API")
+            description = "EDC REST APIs - merged by OpenApiMerger"
+            outputFilename.set(project.name)
+            outputDirectory.set(file("${rootProject.projectDir.path}/resources/openapi/yaml"))
+        }
+        javaLanguageVersion.set(JavaLanguageVersion.of(javaVersion))
+    }
+
+    configure<CheckstyleExtension> {
+        configFile = rootProject.file("resources/edc-checkstyle-config.xml")
+        configDirectory.set(rootProject.file("resources"))
+    }
+
+
+    // EdcRuntimeExtension uses this to determine the runtime classpath of the module to run.
+    tasks.register("printClasspath") {
+        doLast {
+            println(sourceSets["main"].runtimeClasspath.asPath)
+        }
+    }
+
+}
 repositories {
     mavenCentral()
 }
 
-val jetBrainsAnnotationsVersion: String by project
-val jacksonVersion: String by project
-val javaVersion: String by project
-
-val securityType by extra { System.getProperty("security.type", "default") }
-val iamType by extra { System.getProperty("iam.type", "disabled") }
-val configFs by extra { System.getProperty("configuration.fs", "disabled") }
-val jupiterVersion: String by project
-
-subprojects {
-
-    repositories {
-        mavenCentral()
-        maven {
-            url = uri("https://maven.iais.fraunhofer.de/artifactory/eis-ids-public/")
-        }
-        maven {
-            url = uri("https://repository.mulesoft.org/nexus/content/repositories/public/") //used for the multihash lib
-        }
-    }
-
-}
-
-allprojects {
-    apply(plugin = "maven-publish")
-    apply(plugin = "checkstyle")
-    apply(plugin = "java")
-
-    checkstyle {
-        toolVersion = "9.0"
-        configFile = rootProject.file("resources/edc-checkstyle-config.xml")
-    }
-
-    java {
-        toolchain {
-            languageVersion.set(JavaLanguageVersion.of(javaVersion))
-        }
-    }
-
-    pluginManager.withPlugin("java-library") {
-        group = "org.eclipse.dataspaceconnector"
-        version = "0.0.1-SNAPSHOT.1"
-        dependencies {
-            api("org.jetbrains:annotations:${jetBrainsAnnotationsVersion}")
-            api("com.fasterxml.jackson.core:jackson-core:${jacksonVersion}")
-            api("com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}")
-            api("com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}")
-            api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}")
-
-            testImplementation("org.junit.jupiter:junit-jupiter-api:${jupiterVersion}")
-            testImplementation("org.junit.jupiter:junit-jupiter-params:${jupiterVersion}")
-            testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${jupiterVersion}")
-            testImplementation("org.easymock:easymock:4.2")
-            testImplementation("org.assertj:assertj-core:3.19.0")
-
-        }
-
-        publishing {
-            repositories {
-                maven {
-                    name = "GitHubPackages"
-                    url = uri("https://maven.pkg.github.com/eclipse-datasspaceconnector/dataspaceconnector")
-                    credentials {
-                        username = System.getenv("GITHUB_ACTOR")
-                        password = System.getenv("GITHUB_TOKEN")
-                    }
-                }
-            }
-        }
-
-    }
-
-    tasks.withType<Test> {
-        useJUnitPlatform()
-    }
-    tasks.withType<Test> {
-        testLogging {
-            events("passed", "skipped", "failed")
-            showStackTraces = true
-            exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
-        }
-    }
-    tasks.withType<Checkstyle> {
-        reports {
-            // lets not generate any reports because that is done from within the Github Actions workflow
-            html.required.set(false)
-            xml.required.set(false)
-        }
+// Dependency analysis active if property "dependency.analysis" is set. Possible values are <'fail'|'warn'|'ignore'>.
+if (project.hasProperty("dependency.analysis")) {
+    apply(plugin = "org.eclipse.edc.dependency-rules")
+    configure<org.eclipse.edc.gradle.DependencyRulesPluginExtension> {
+        severity.set(project.property("dependency.analysis").toString())
     }
 }
 
-val test by tasks.getting(Test::class) {
-    useJUnitPlatform()
+// todo: remove once https://github.com/eclipse-dataspaceconnector/DataSpaceConnector/issues/2191 is complete
+swaggerSources {
+    create("edc").apply {
+        setInputFile(file("./resources/openapi/openapi.yaml"))
+        ui(closureOf<org.hidetake.gradle.swagger.generator.GenerateSwaggerUI> {
+            outputDir = file("docs/swaggerui")
+            wipeOutputDir = true
+        })
+    }
 }

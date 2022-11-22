@@ -9,6 +9,7 @@
  *
  *  Contributors:
  *       Microsoft Corporation - initial API and implementation
+ *       Fraunhofer Institute for Software and Systems Engineering - added module
  *
  */
 
@@ -18,18 +19,18 @@ plugins {
 
 
 dependencies {
-    api(project(":spi"))
     api(project(":data-protocols:ids:ids-spi"))
     api(project(":data-protocols:ids:ids-core"))
-    api(project(":data-protocols:ids:ids-api-catalog"))
-    api(project(":data-protocols:ids:ids-api-transfer"))
-    api(project(":data-protocols:ids:ids-policy-mock"))
+    api(project(":data-protocols:ids:ids-transform-v1"))
+    api(project(":data-protocols:ids:ids-api-multipart-endpoint-v1"))
+    api(project(":data-protocols:ids:ids-api-multipart-dispatcher-v1"))
+    api(project(":data-protocols:ids:ids-api-configuration"))
 }
 
 publishing {
     publications {
-        create<MavenPublication>("data-protocols.ids") {
-            artifactId = "data-protocols.ids"
+        create<MavenPublication>("ids") {
+            artifactId = "ids"
             from(components["java"])
         }
     }

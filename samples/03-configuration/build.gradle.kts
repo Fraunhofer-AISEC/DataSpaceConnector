@@ -9,28 +9,30 @@
  *
  *  Contributors:
  *       Microsoft Corporation - initial API and implementation
+ *       Fraunhofer Institute for Software and Systems Engineering - added dependencies
+ *       ZF Friedrichshafen AG - add dependency
  *
  */
 
 plugins {
     `java-library`
     id("application")
-    id("com.github.johnrengelman.shadow") version "7.0.0"
+    id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
-val rsApi: String by project
-
 dependencies {
-    implementation(project(":core"))
-    implementation(project(":extensions:in-memory:transfer-store-memory"))
-    implementation(project(":extensions:filesystem:configuration-fs"))
+    implementation(project(":core:control-plane:control-plane-core"))
+    implementation(project(":extensions:common:http"))
 
-    implementation("jakarta.ws.rs:jakarta.ws.rs-api:${rsApi}")
+    implementation(project(":extensions:control-plane:api:management-api"))
+
+    implementation(project(":extensions:common:configuration:configuration-filesystem"))
+
+    implementation(libs.jakarta.rsApi)
 }
 
 application {
-    @Suppress("DEPRECATION")
-    mainClassName = "org.eclipse.dataspaceconnector.system.runtime.BaseRuntime"
+    mainClass.set("org.eclipse.edc.boot.system.runtime.BaseRuntime")
 }
 
 tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {

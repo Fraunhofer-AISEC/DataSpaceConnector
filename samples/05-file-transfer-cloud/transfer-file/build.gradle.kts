@@ -14,16 +14,16 @@
 
 plugins {
     `java-library`
-    id("application")
 }
 
-val rsApi: String by project
-
 dependencies {
-    api(project(":spi"))
+    implementation(project(":core:control-plane:control-plane-core"))
+    implementation(project(":core:data-plane:data-plane-core"))
+    implementation(project(":extensions:data-plane:data-plane-azure-storage"))
+    implementation(project(":extensions:data-plane:data-plane-aws-s3"))
+    implementation(project(":extensions:control-plane:data-plane-transfer:data-plane-transfer-client"))
+    implementation(project(":extensions:data-plane-selector:data-plane-selector-client"))
+    implementation(project(":core:data-plane-selector:data-plane-selector-core"))
 
-    api(project(":extensions:aws:s3:provision"))
-    implementation(project(":extensions:azure:blob:api"))
-
-    implementation("jakarta.ws.rs:jakarta.ws.rs-api:${rsApi}")
+    implementation(libs.opentelemetry.annotations)
 }
