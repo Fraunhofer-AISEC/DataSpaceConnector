@@ -158,8 +158,10 @@ include(":extensions:data-plane:data-plane-http")
 include(":extensions:data-plane:data-plane-aws-s3")
 include(":extensions:data-plane:data-plane-google-storage")
 include(":extensions:data-plane:data-plane-integration-tests")
+include("extensions:data-plane:data-plane-idscp2")
 include(":extensions:data-plane:store:sql:data-plane-store-sql")
 include(":extensions:data-plane:store:cosmos:data-plane-store-cosmos")
+
 
 
 
@@ -248,3 +250,4 @@ include(":system-tests:runtimes:azure-storage-transfer-provider")
 include(":system-tests:runtimes:file-transfer-consumer")
 include(":system-tests:runtimes:file-transfer-provider")
 include(":system-tests:tests")
+
