@@ -165,8 +165,10 @@ include(":extensions:data-plane:data-plane-http-oauth2-core")
 include(":extensions:data-plane:data-plane-aws-s3")
 include(":extensions:data-plane:data-plane-google-storage")
 include(":extensions:data-plane:data-plane-integration-tests")
+include(":extensions:data-plane:data-plane-idscp2")
 include(":extensions:data-plane:store:sql:data-plane-store-sql")
 include(":extensions:data-plane:store:cosmos:data-plane-store-cosmos")
+
 
 
 include(":extensions:data-plane-selector:data-plane-selector-api")
