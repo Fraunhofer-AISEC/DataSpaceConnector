@@ -20,7 +20,8 @@ dependencies {
     api(project(":spi:data-plane:data-plane-spi"))
     implementation(project(":core:common:util"))
     implementation(project(":core:data-plane:data-plane-util"))
-    implementation(libs.idscp2)
+    implementation(libs.idscp2.core)
+    implementation(libs.idscp2.daps.aisec)
     testImplementation(project(":core:common:junit"))
 }
 
