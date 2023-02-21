@@ -11,9 +11,11 @@
  *       Fraunhofer AISEC
  *
  */
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     `java-library`
+   id("org.jetbrains.kotlin.jvm") version "1.8.10"
 }
 
 dependencies {
