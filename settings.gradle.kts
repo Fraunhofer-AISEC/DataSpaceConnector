@@ -181,6 +181,7 @@ include(":extensions:data-plane-selector:store:cosmos:data-plane-instance-store-
 include(":launchers:data-plane-server")
 include(":launchers:dpf-selector")
 include(":launchers:ids-connector")
+include(":launchers:ids-connector-idscp2")
 
 // extension points for a connector ----------------------------------------------------------------
 include(":spi:common:auth-spi")

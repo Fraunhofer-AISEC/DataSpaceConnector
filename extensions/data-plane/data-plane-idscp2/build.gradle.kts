@@ -11,9 +11,11 @@
  *       Fraunhofer AISEC
  *
  */
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     `java-library`
+   id("org.jetbrains.kotlin.jvm") version "1.8.10"
 }
 
 dependencies {
@@ -30,6 +32,15 @@ publishing {
         create<MavenPublication>("data-plane-idscp2") {
             artifactId = "data-plane-idscp2"
             from(components["java"])
+        }
+    }
+}
+
+subprojects {
+    apply(plugin = "org.jetbrains.kotlin.jvm")
+    tasks.withType<KotlinCompile> {
+        kotlinOptions {
+            jvmTarget = "11"
         }
     }
 }
