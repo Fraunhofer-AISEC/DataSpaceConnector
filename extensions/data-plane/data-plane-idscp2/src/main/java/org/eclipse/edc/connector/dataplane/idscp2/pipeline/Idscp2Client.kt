@@ -11,7 +11,6 @@ import de.fhg.aisec.ids.idscp2.daps.aisecdaps.AisecDapsDriver
 import de.fhg.aisec.ids.idscp2.daps.aisecdaps.AisecDapsDriverConfig
 import de.fhg.aisec.ids.idscp2.daps.aisecdaps.SecurityProfile
 import de.fhg.aisec.ids.idscp2.daps.aisecdaps.SecurityRequirements
-import de.fhg.aisec.ids.idscp2.defaultdrivers.daps.nulldaps.NullDaps
 import de.fhg.aisec.ids.idscp2.defaultdrivers.remoteattestation.demo.DemoRaProver
 import de.fhg.aisec.ids.idscp2.defaultdrivers.remoteattestation.demo.DemoRaVerifier
 import de.fhg.aisec.ids.idscp2.defaultdrivers.securechannel.tls13.NativeTLSDriver
@@ -20,8 +19,11 @@ import de.fhg.aisec.ids.idscp2.keystores.KeyStoreUtil
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.nio.charset.StandardCharsets
+import java.nio.file.Path
+import java.nio.file.Paths
 import java.security.KeyStore
 import java.security.cert.X509Certificate
+import org.eclipse.edc.spi.system.ServiceExtensionContext
 import org.slf4j.LoggerFactory
 
 class Idscp2Client {
@@ -29,7 +31,7 @@ class Idscp2Client {
     private var config =  Idscp2Configuration();
     private lateinit var tlsConfig: NativeTlsConfiguration;
 
-    fun init(host: String, alias: String) {
+    fun init(host: String, alias: String, context: ServiceExtensionContext) {
         // register ra drivers
         RaProverDriverRegistry.registerDriver(
                 DemoRaProver.DEMO_RA_PROVER_ID,
@@ -43,9 +45,12 @@ class Idscp2Client {
                 null
         )
 
-        val password ="";
-        val keyStorePath="";
-        val trustStorePath="";
+        val password =context.config.getString("edc.web.idscp2.keystore.password", "keystore-password").toCharArray();
+        val keyStorePath: Path = Paths.get(context.config.getString("edc.web.idscp2.keystore.path", "dataspaceconnector-keystore.jks"));
+        val trustStorePath: Path = Paths.get(context.config.getString("edc.web.idscp2.keystore.path", "dataspaceconnector-truststore.jks"));
+
+        val monitor = context.monitor
+        monitor.info("Path:" +keyStorePath)
 
         val securityRequirements = SecurityRequirements.Builder()
                 .setRequiredSecurityLevel(SecurityProfile.INVALID)

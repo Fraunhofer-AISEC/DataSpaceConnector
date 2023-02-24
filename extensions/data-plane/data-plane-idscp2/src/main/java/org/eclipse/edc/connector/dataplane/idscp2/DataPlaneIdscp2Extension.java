@@ -36,12 +36,12 @@ public class DataPlaneIdscp2Extension implements ServiceExtension {
     public void initialize(ServiceExtensionContext context) {
 
         var monitor = context.getMonitor();
-        monitor.info("###############IDSCP2 Extension started###############" );
+        monitor.info("###############IDSCP2 Extension started###############");
         context.getConfig("");
 
 
         var client = new Idscp2Client();
-        client.init("localhost","1");
+        client.init("localhost", "1", context);
         client.send("test-message");
     }
 }
