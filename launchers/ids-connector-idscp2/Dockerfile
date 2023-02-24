@@ -17,12 +17,12 @@ FROM gradle:7.4.1-jdk17 AS build
 
 COPY --chown=gradle:gradle . /home/gradle/project/
 WORKDIR /home/gradle/project/
-RUN gradle :launchers:ids-connector:build --no-daemon
+RUN gradle :launchers:ids-connector-idscp2:build --no-daemon
 
 FROM openjdk:17-slim
 
 WORKDIR /app
-COPY --from=build /home/gradle/project/launchers/ids-connector/build/libs/dataspace-connector.jar /app
+COPY --from=build /home/gradle/project/launchers/ids-connector-idscp2/build/libs/dataspace-connector-idscp2.jar /app
 
 ENV EDC_FS_CONFIG=$EDC_FS_CONFIG
 ENV EDC_VAULT=$EDC_VAULT
