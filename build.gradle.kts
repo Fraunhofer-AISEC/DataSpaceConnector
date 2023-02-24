@@ -15,6 +15,7 @@
 
 plugins {
     `java-library`
+    kotlin("jvm") version "1.8.10" apply false
 }
 
 val javaVersion: String by project
