@@ -138,9 +138,10 @@ public class Idscp2ServerJ implements Idscp2EndpointListener<Idscp2Connection> {
             }
         });
         connection.addMessageListener((c, data) -> {
-            LOG.info("Received message: " + new String(data, StandardCharsets.UTF_8).trim());
-            // TODO:
-            // Do something with received message
+            LOG.info("Received ping message: " + new String(data, StandardCharsets.UTF_8).trim());
+
+            LOG.info("Sending PONG...");
+            c.nonBlockingSend("PONG".getBytes(StandardCharsets.UTF_8));
         });
     }
 }

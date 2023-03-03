@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 
 public class Idscp2ClientJ {
     private static final Logger LOG = LoggerFactory.getLogger(Idscp2ClientJ.class);
-    private NativeTLSDriver<Idscp2Connection> secureChannelDriver = new NativeTLSDriver<Idscp2Connection>();
+    private NativeTLSDriver<Idscp2Connection> secureChannelDriver = new NativeTLSDriver<>();
     private Idscp2Configuration config;
     private NativeTlsConfiguration tlsConfig;
 
@@ -142,7 +142,7 @@ public class Idscp2ClientJ {
             connection.unlockMessaging();
             LOG.info("Send Message");
             connection.nonBlockingSend(message.getBytes(StandardCharsets.UTF_8));
-            LOG.info("Local DAT: " + new String(connection.getLocalDynamicAttributeToken(), StandardCharsets.UTF_8));
+            LOG.info("Local DAT: " + new String(connection.getLocalDat(), StandardCharsets.UTF_8));
         }).exceptionally(t -> {
             LOG.error("Client endpoint error occurred", t);
             return null;

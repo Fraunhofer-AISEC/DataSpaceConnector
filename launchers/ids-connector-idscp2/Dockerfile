@@ -39,4 +39,4 @@ ENTRYPOINT java \
     -Dedc.ids.description="Eclipse Dataspace Connector with IDS extensions" \
     -Dedc.ids.maintainer="https://example.maintainer.com" \
     -Dedc.ids.curator="https://example.maintainer.com" \
-    -jar dataspace-connector.jar
+    -jar dataspace-connector-idscp2.jar
