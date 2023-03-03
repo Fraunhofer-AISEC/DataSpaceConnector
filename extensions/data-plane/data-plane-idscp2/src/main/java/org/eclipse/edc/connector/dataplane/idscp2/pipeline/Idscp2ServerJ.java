@@ -1,11 +1,11 @@
 package org.eclipse.edc.connector.dataplane.idscp2.pipeline;
+
 import de.fhg.aisec.ids.idscp2.api.configuration.AttestationConfig;
 import de.fhg.aisec.ids.idscp2.api.configuration.Idscp2Configuration;
 import de.fhg.aisec.ids.idscp2.api.connection.Idscp2Connection;
 import de.fhg.aisec.ids.idscp2.api.connection.Idscp2ConnectionAdapter;
 import de.fhg.aisec.ids.idscp2.api.raregistry.RaProverDriverRegistry;
 import de.fhg.aisec.ids.idscp2.api.raregistry.RaVerifierDriverRegistry;
-import de.fhg.aisec.ids.idscp2.core.connection.Idscp2ConnectionImpl;
 import de.fhg.aisec.ids.idscp2.daps.aisecdaps.AisecDapsDriver;
 import de.fhg.aisec.ids.idscp2.daps.aisecdaps.AisecDapsDriverConfig;
 import de.fhg.aisec.ids.idscp2.daps.aisecdaps.SecurityProfile;
@@ -15,7 +15,10 @@ import de.fhg.aisec.ids.idscp2.defaultdrivers.remoteattestation.demo.DemoRaVerif
 import de.fhg.aisec.ids.idscp2.defaultdrivers.securechannel.tls13.NativeTLSDriver;
 import de.fhg.aisec.ids.idscp2.defaultdrivers.securechannel.tls13.NativeTlsConfiguration;
 import de.fhg.aisec.ids.idscp2.keystores.KeyStoreUtil;
-
+import org.eclipse.edc.spi.monitor.Monitor;
+import org.eclipse.edc.spi.system.ServiceExtensionContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -26,20 +29,14 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
-import org.eclipse.edc.spi.monitor.Monitor;
-import org.eclipse.edc.spi.system.ServiceExtensionContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-public class Idscp2ClientJ {
+public class Idscp2ServerJ {
     private static final Logger LOG = LoggerFactory.getLogger(Idscp2ClientJ.class);
-    private NativeTLSDriver<Idscp2Connection> secureChannelDriver = new NativeTLSDriver<Idscp2Connection>();
+    private NativeTLSDriver<Idscp2Connection> secureChannelDriver = new NativeTLSDriver<Idscp2Connection>();;
     private Idscp2Configuration config;
     private NativeTlsConfiguration tlsConfig;
 
-    public void  init(String host, String alias, ServiceExtensionContext context) {
+    public void  init(String host, String alias, ServiceExtensionContext context)  {
         // register ra drivers
         RaProverDriverRegistry regProv;
         regProv.registerDriver(
@@ -126,28 +123,25 @@ public class Idscp2ClientJ {
         return certificates;
     }
 
-    public void send(String message) {
-        CompletableFuture<Idscp2Connection> connectionFuture = secureChannelDriver.connect(Idscp2ConnectionImpl.class, config, tlsConfig);
-        connectionFuture.thenAccept(connection -> {
-            LOG.info("Client: New connection with id " + connection.getId());
-            connection.addConnectionListener(new Idscp2ConnectionAdapter() {
-                @Override
-                public void onError(Throwable t) {
-                   LOG.error("Client connection error occurred", t);
-                }
 
-                @Override
-                public void onClose() {
-                    LOG.info("Client: Connection with id " + connection.getId() + " has been closed");
-                }
-            });
-            connection.unlockMessaging();
-            LOG.info("Send Message");
-            connection.nonBlockingSend(message.getBytes(StandardCharsets.UTF_8));
-            LOG.info("Local DAT: " + new String(connection.getLocalDynamicAttributeToken(), StandardCharsets.UTF_8));
-        }).exceptionally(t -> {
-            LOG.error("Client endpoint error occurred", t);
-            return null;
+    @Override
+    public void onConnection(Idscp2Connection connection) {
+        LOG.info("Server: New connection with id " + connection.getId());
+        connection.addConnectionListener(new Idscp2ConnectionAdapter() {
+            @Override
+            public void onError(Throwable t) {
+                LOG.error("Server connection error occurred", t);
+            }
+
+            @Override
+            public void onClose() {
+                LOG.info("Server: Connection with id " + connection.getId() + " has been closed");
+            }
+        });
+        connection.addMessageListener((c, data) -> {
+            LOG.info("Received message: " + new String(data, StandardCharsets.UTF_8).trim());
+            // TODO:
+            // Do something with received message
         });
     }
 }
