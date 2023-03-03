@@ -15,6 +15,7 @@
 package org.eclipse.edc.connector.dataplane.idscp2;
 
 import org.eclipse.edc.connector.dataplane.idscp2.pipeline.Idscp2Client;
+import org.eclipse.edc.connector.dataplane.idscp2.pipeline.Idscp2Server;
 import org.eclipse.edc.runtime.metamodel.annotation.Extension;
 import org.eclipse.edc.spi.system.ServiceExtension;
 import org.eclipse.edc.spi.system.ServiceExtensionContext;
@@ -37,11 +38,14 @@ public class DataPlaneIdscp2Extension implements ServiceExtension {
 
         var monitor = context.getMonitor();
         monitor.info("###############IDSCP2 Extension started###############");
-        context.getConfig("");
 
-
+        // Client
         var client = new Idscp2Client();
-        client.init("localhost", "1", context);
+        client.init("tc-core-server", "1", context);
         client.send("test-message");
+
+        // Server
+        var server = new Idscp2Server();
+        server.init("localhost", "1", context);
     }
 }
