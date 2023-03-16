@@ -1,5 +1,6 @@
 package org.eclipse.edc.connector.dataplane.idscp2.pipeline;
 
+import de.fhg.aisec.ids.idscp2.api.Idscp2EndpointListener;
 import de.fhg.aisec.ids.idscp2.api.configuration.AttestationConfig;
 import de.fhg.aisec.ids.idscp2.api.configuration.Idscp2Configuration;
 import de.fhg.aisec.ids.idscp2.api.connection.Idscp2Connection;
@@ -30,7 +31,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
-public class Idscp2ServerJ {
+public class Idscp2ServerJ implements Idscp2EndpointListener<Idscp2Connection> {
     private static final Logger LOG = LoggerFactory.getLogger(Idscp2ClientJ.class);
     private NativeTLSDriver<Idscp2Connection> secureChannelDriver = new NativeTLSDriver<Idscp2Connection>();;
     private Idscp2Configuration config;
@@ -38,17 +39,15 @@ public class Idscp2ServerJ {
 
     public void  init(String host, String alias, ServiceExtensionContext context)  {
         // register ra drivers
-        RaProverDriverRegistry regProv;
-        regProv.registerDriver(
+        RaProverDriverRegistry.INSTANCE.registerDriver(
                 DemoRaProver.DEMO_RA_PROVER_ID,
-                DemoRaProver.class,
+                DemoRaProver::new,
                 null
         );
 
-        RaVerifierDriverRegistry regVer;
-        regVer.registerDriver(
+        RaVerifierDriverRegistry.INSTANCE.registerDriver(
                 DemoRaVerifier.DEMO_RA_VERIFIER_ID,
-                DemoRaVerifier.class,
+                DemoRaVerifier::new,
                 null
         );
 

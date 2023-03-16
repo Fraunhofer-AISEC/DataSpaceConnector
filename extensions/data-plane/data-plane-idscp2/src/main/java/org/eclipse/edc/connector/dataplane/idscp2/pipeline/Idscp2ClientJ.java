@@ -41,17 +41,15 @@ public class Idscp2ClientJ {
 
     public void  init(String host, String alias, ServiceExtensionContext context) {
         // register ra drivers
-        RaProverDriverRegistry regProv;
-        regProv.registerDriver(
+        RaProverDriverRegistry.INSTANCE.registerDriver(
                 DemoRaProver.DEMO_RA_PROVER_ID,
-                DemoRaProver.class,
+                DemoRaProver::new,
                 null
         );
 
-        RaVerifierDriverRegistry regVer;
-        regVer.registerDriver(
+        RaVerifierDriverRegistry.INSTANCE.registerDriver(
                 DemoRaVerifier.DEMO_RA_VERIFIER_ID,
-                DemoRaVerifier.class,
+                DemoRaVerifier::new,
                 null
         );
 
@@ -127,7 +125,7 @@ public class Idscp2ClientJ {
     }
 
     public void send(String message) {
-        CompletableFuture<Idscp2Connection> connectionFuture = secureChannelDriver.connect(Idscp2ConnectionImpl.class, config, tlsConfig);
+        CompletableFuture<Idscp2Connection> connectionFuture = secureChannelDriver.connect(Idscp2ConnectionImpl::new, config, tlsConfig);
         connectionFuture.thenAccept(connection -> {
             LOG.info("Client: New connection with id " + connection.getId());
             connection.addConnectionListener(new Idscp2ConnectionAdapter() {
