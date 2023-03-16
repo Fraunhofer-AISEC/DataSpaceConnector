@@ -11,36 +11,16 @@
  *       Fraunhofer AISEC
  *
  */
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     `java-library`
-   id("org.jetbrains.kotlin.jvm") version "1.8.10"
 }
 
 dependencies {
     api(project(":spi:data-plane:data-plane-spi"))
     implementation(project(":core:common:util"))
     implementation(project(":core:data-plane:data-plane-util"))
-    implementation(libs.idscp2.core)
-    implementation(libs.idscp2.daps.aisec)
+    implementation("de.fhg.aisec.ids:idscp2-core:0.18.0")
+    implementation("de.fhg.aisec.ids:idscp2-daps-aisec:0.18.0")
     testImplementation(project(":core:common:junit"))
-}
-
-publishing {
-    publications {
-        create<MavenPublication>("data-plane-idscp2") {
-            artifactId = "data-plane-idscp2"
-            from(components["java"])
-        }
-    }
-}
-
-subprojects {
-    apply(plugin = "org.jetbrains.kotlin.jvm")
-    tasks.withType<KotlinCompile> {
-        kotlinOptions {
-            jvmTarget = "11"
-        }
-    }
 }
