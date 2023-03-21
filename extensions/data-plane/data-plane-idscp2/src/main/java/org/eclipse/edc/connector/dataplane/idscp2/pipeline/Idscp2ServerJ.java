@@ -1,3 +1,17 @@
+/*
+ *  Copyright (c) 2023 Fraunhofer AISEC
+ *
+ *  This program and the accompanying materials are made available under the
+ *  terms of the Apache License, Version 2.0 which is available at
+ *  https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  SPDX-License-Identifier: Apache-2.0
+ *
+ *  Contributors:
+ *       Fraunhofer AISEC - implementation
+ *
+ */
+
 package org.eclipse.edc.connector.dataplane.idscp2.pipeline;
 
 import de.fhg.aisec.ids.idscp2.api.Idscp2EndpointListener;
@@ -20,6 +34,7 @@ import org.eclipse.edc.spi.monitor.Monitor;
 import org.eclipse.edc.spi.system.ServiceExtensionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -33,7 +48,7 @@ import java.util.List;
 
 public class Idscp2ServerJ implements Idscp2EndpointListener<Idscp2Connection> {
     private static final Logger LOG = LoggerFactory.getLogger(Idscp2ClientJ.class);
-    private NativeTLSDriver<Idscp2Connection> secureChannelDriver = new NativeTLSDriver<Idscp2Connection>();;
+    private NativeTLSDriver<Idscp2Connection> secureChannelDriver = new NativeTLSDriver<>();
     private Idscp2Configuration config;
     private NativeTlsConfiguration tlsConfig;
 
