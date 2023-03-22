@@ -47,8 +47,8 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-public class Idscp2ClientJ {
-    private static final Logger LOG = LoggerFactory.getLogger(Idscp2ClientJ.class);
+public class Idscp2Client {
+    private static final Logger LOG = LoggerFactory.getLogger(Idscp2Client.class);
     private final NativeTLSDriver<Idscp2Connection> secureChannelDriver = new NativeTLSDriver<>();
     private Idscp2Configuration config;
     private NativeTlsConfiguration tlsConfig;

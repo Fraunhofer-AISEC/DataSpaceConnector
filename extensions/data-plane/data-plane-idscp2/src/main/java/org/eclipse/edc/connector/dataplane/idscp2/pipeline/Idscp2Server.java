@@ -46,8 +46,8 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
-public class Idscp2ServerJ implements Idscp2EndpointListener<Idscp2Connection> {
-    private static final Logger LOG = LoggerFactory.getLogger(Idscp2ClientJ.class);
+public class Idscp2Server implements Idscp2EndpointListener<Idscp2Connection> {
+    private static final Logger LOG = LoggerFactory.getLogger(Idscp2Client.class);
     private NativeTLSDriver<Idscp2Connection> secureChannelDriver = new NativeTLSDriver<>();
     private Idscp2Configuration config;
     private NativeTlsConfiguration tlsConfig;
