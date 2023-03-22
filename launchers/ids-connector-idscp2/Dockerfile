@@ -13,7 +13,7 @@
 #
 #
 
-FROM gradle:7.4.1-jdk17 AS build
+FROM gradle:8.0.2-jdk17 AS build
 
 COPY --chown=gradle:gradle . /home/gradle/project/
 WORKDIR /home/gradle/project/
