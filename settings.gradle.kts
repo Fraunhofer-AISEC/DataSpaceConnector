@@ -108,6 +108,7 @@ include(":extensions:common:iam:decentralized-identity:identity-did-service")
 include(":extensions:common:iam:decentralized-identity:identity-did-web")
 include(":extensions:common:iam:iam-mock")
 include(":extensions:common:iam:oauth2:oauth2-daps")
+include(":extensions:common:iam:daps")
 include(":extensions:common:iam:oauth2:oauth2-core")
 include(":extensions:common:metrics:micrometer-core")
 include(":extensions:common:monitor:monitor-jdk-logger")
@@ -172,6 +173,7 @@ include(":extensions:data-plane-selector:store:cosmos:data-plane-instance-store-
 include(":launchers:data-plane-server")
 include(":launchers:dpf-selector")
 include(":launchers:ids-connector")
+include(":launchers:ids-connector-daps")
 
 // numbered samples for the onboarding experience --------------------------------------------------
 include(":samples:01-basic-connector")
