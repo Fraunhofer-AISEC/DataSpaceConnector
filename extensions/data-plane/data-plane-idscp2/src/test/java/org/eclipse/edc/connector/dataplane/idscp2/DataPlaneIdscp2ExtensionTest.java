@@ -22,9 +22,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 @ExtendWith(EdcExtension.class)
 public class DataPlaneIdscp2ExtensionTest {
+    static DataPlaneIdscp2Extension ie = null;
     @BeforeAll
     public static void setUp() {
-       //
+        ie = new DataPlaneIdscp2Extension();
     }
 
     @AfterAll
@@ -34,11 +35,13 @@ public class DataPlaneIdscp2ExtensionTest {
 
     @Test
     void sendToClient(){
-        //
+      //
+
     }
 
     @Test
     void receive(){
         //
+
     }
 }

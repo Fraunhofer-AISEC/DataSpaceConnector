@@ -16,7 +16,7 @@ package org.eclipse.edc.connector.dataplane.idscp2.pipeline;
 
 import org.junit.jupiter.api.Test;
 
-public class Idscp2ServerTest {
+public class Idscp2DataSourceTest {
     @Test
     void testServer(){
         //

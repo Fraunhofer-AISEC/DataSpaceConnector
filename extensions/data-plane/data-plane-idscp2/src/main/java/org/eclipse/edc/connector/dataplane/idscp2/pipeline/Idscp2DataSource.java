@@ -30,6 +30,7 @@ import de.fhg.aisec.ids.idscp2.defaultdrivers.remoteattestation.demo.DemoRaVerif
 import de.fhg.aisec.ids.idscp2.defaultdrivers.securechannel.tls13.NativeTLSDriver;
 import de.fhg.aisec.ids.idscp2.defaultdrivers.securechannel.tls13.NativeTlsConfiguration;
 import de.fhg.aisec.ids.idscp2.keystores.KeyStoreUtil;
+import org.eclipse.edc.connector.dataplane.spi.pipeline.DataSource;
 import org.eclipse.edc.spi.monitor.Monitor;
 import org.eclipse.edc.spi.system.ServiceExtensionContext;
 import org.slf4j.Logger;
@@ -45,14 +46,18 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
 
-public class Idscp2Server implements Idscp2EndpointListener<Idscp2Connection> {
-    private static final Logger LOG = LoggerFactory.getLogger(Idscp2Client.class);
+public class Idscp2DataSource implements DataSource, Idscp2EndpointListener<Idscp2Connection> {
+    private static final Logger LOG = LoggerFactory.getLogger(Idscp2DataSink.class);
     private NativeTLSDriver<Idscp2Connection> secureChannelDriver = new NativeTLSDriver<>();
     private Idscp2Configuration config;
     private NativeTlsConfiguration tlsConfig;
+    private Monitor monitor;
+    private String name;
 
-    public void  init(String host, String alias, ServiceExtensionContext context)  {
+    public void  init(String host, Integer port, String alias, ServiceExtensionContext context)  {
         // register ra drivers
         RaProverDriverRegistry.INSTANCE.registerDriver(
                 DemoRaProver.DEMO_RA_PROVER_ID,
@@ -114,6 +119,7 @@ public class Idscp2Server implements Idscp2EndpointListener<Idscp2Connection> {
                 .setTrustStorePassword(password)
                 .setCertificateAlias(alias)
                 .setHost(host)
+                .setServerPort(port)
                 .build();
     }
 
@@ -137,6 +143,22 @@ public class Idscp2Server implements Idscp2EndpointListener<Idscp2Connection> {
         return certificates;
     }
 
+    @Override
+    public Stream<Part> openPartStream() {
+        return null;
+    }
+
+    public interface ServerListener {
+        void response(String res);
+    }
+
+    private ServerListener listener = null;
+
+    public void setListener(ServerListener listener) {
+        this.listener = listener;
+    }
+
+
 
     @Override
     public void onConnection(Idscp2Connection connection) {
@@ -156,6 +178,36 @@ public class Idscp2Server implements Idscp2EndpointListener<Idscp2Connection> {
             LOG.info("Received message: " + new String(data, StandardCharsets.UTF_8).trim());
             // TODO:
             // Do something with received message
+            if (listener != null) {
+                listener.response(data.toString());
+            }
         });
+    }
+
+    public static class Builder {
+        private final Idscp2DataSource dataSource;
+
+        public static Builder newInstance() {
+            return new Builder();
+        }
+
+        private Builder() {
+            dataSource = new Idscp2DataSource();
+        }
+
+        public Builder name(String name) {
+            dataSource.name = name;
+            return this;
+        }
+
+        public Builder monitor(Monitor monitor) {
+            dataSource.monitor = monitor;
+            return this;
+        }
+
+        public Idscp2DataSource build() {
+            Objects.requireNonNull(dataSource.monitor, "monitor");
+            return dataSource;
+        }
     }
 }

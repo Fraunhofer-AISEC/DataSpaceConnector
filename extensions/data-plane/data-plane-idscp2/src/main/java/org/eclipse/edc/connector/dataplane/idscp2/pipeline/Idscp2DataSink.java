@@ -30,7 +30,10 @@ import de.fhg.aisec.ids.idscp2.defaultdrivers.remoteattestation.demo.DemoRaVerif
 import de.fhg.aisec.ids.idscp2.defaultdrivers.securechannel.tls13.NativeTLSDriver;
 import de.fhg.aisec.ids.idscp2.defaultdrivers.securechannel.tls13.NativeTlsConfiguration;
 import de.fhg.aisec.ids.idscp2.keystores.KeyStoreUtil;
+import org.eclipse.edc.connector.dataplane.spi.pipeline.DataSink;
+import org.eclipse.edc.connector.dataplane.spi.pipeline.DataSource;
 import org.eclipse.edc.spi.monitor.Monitor;
+import org.eclipse.edc.spi.response.StatusResult;
 import org.eclipse.edc.spi.system.ServiceExtensionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,13 +48,16 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
-public class Idscp2Client {
-    private static final Logger LOG = LoggerFactory.getLogger(Idscp2Client.class);
+public class Idscp2DataSink implements DataSink {
+    private static final Logger LOG = LoggerFactory.getLogger(Idscp2DataSink.class);
     private final NativeTLSDriver<Idscp2Connection> secureChannelDriver = new NativeTLSDriver<>();
     private Idscp2Configuration config;
     private NativeTlsConfiguration tlsConfig;
+    private String name;
+    private Monitor monitor;
 
     public static List<X509Certificate> getKeyChain(KeyStore keyStore) {
         List<X509Certificate> certificates = new ArrayList<>();
@@ -73,7 +79,7 @@ public class Idscp2Client {
         return certificates;
     }
 
-    public void init(String host, String alias, ServiceExtensionContext context) {
+    public void init(String host, Integer port, String alias, ServiceExtensionContext context) {
         // register ra drivers
         RaProverDriverRegistry.INSTANCE.registerDriver(DemoRaProver.DEMO_RA_PROVER_ID, DemoRaProver::new, null);
 
@@ -102,7 +108,7 @@ public class Idscp2Client {
                 .setHandshakeTimeoutDelay(5 * 1000L) // 5 seconds
                 .setAttestationConfig(localAttestationConfig).setDapsDriver(dapsDriver).build();
 
-        tlsConfig = new NativeTlsConfiguration.Builder().setKeyStorePath(keyStorePath).setKeyStorePassword(password).setKeyPassword(password).setTrustStorePath(trustStorePath).setTrustStorePassword(password).setCertificateAlias(alias).setHost(host)
+        tlsConfig = new NativeTlsConfiguration.Builder().setKeyStorePath(keyStorePath).setKeyStorePassword(password).setKeyPassword(password).setTrustStorePath(trustStorePath).setTrustStorePassword(password).setCertificateAlias(alias).setHost(host).setServerPort(port)
                 .build();
     }
 
@@ -121,6 +127,11 @@ public class Idscp2Client {
                     LOG.error("Client connection error occurred", t);
                 }
             });
+      /*      connection.addMessageListener(Idscp2Connection c, Byte[] data){
+                return data;
+                c.close();
+            } */
+
             connection.unlockMessaging();
             LOG.info("Send Message");
             connection.nonBlockingSend(message.getBytes(StandardCharsets.UTF_8));
@@ -129,5 +140,37 @@ public class Idscp2Client {
             LOG.error("Client endpoint error occurred", t);
             return null;
         });
+    }
+
+    @Override
+    public CompletableFuture<StatusResult<Void>> transfer(DataSource source) {
+        return null;
+    }
+
+    public static class Builder {
+        private final Idscp2DataSink dataSink;
+
+        public static Idscp2DataSink.Builder newInstance() {
+            return new Idscp2DataSink.Builder();
+        }
+
+        private Builder() {
+            dataSink = new Idscp2DataSink();
+        }
+
+        public Idscp2DataSink.Builder name(String name) {
+            dataSink.name = name;
+            return this;
+        }
+
+        public Idscp2DataSink.Builder monitor(Monitor monitor) {
+            dataSink.monitor = monitor;
+            return this;
+        }
+
+        public Idscp2DataSink build() {
+            Objects.requireNonNull(dataSink.monitor, "monitor");
+            return dataSink;
+        }
     }
 }

@@ -14,11 +14,15 @@
 
 package org.eclipse.edc.connector.dataplane.idscp2.pipeline;
 
+import static org.mockito.Mockito.mock;
+
+import org.eclipse.edc.connector.dataplane.idscp2.DataPlaneIdscp2Extension;
 import org.junit.jupiter.api.Test;
 
-public class Idscp2ClientTest {
+public class Idscp2DataSinkTest {
+    DataPlaneIdscp2Extension ie = null;
     @Test
     void testClient(){
-        //
+
     }
 }
